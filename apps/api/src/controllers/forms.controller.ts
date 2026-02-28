@@ -175,3 +175,19 @@ export async function getVersions(req: AuthRequest, res: Response, next: NextFun
     next(error);
   }
 }
+
+/**
+ * GET /api/forms/slug/:slug — Récupérer un formulaire public par slug
+ */
+export async function getFormBySlug(req: AuthRequest, res: Response, next: NextFunction) {
+  try {
+    const form = await formService.getBySlug(req.params.slug);
+
+    res.json({
+      success: true,
+      data: form,
+    });
+  } catch (error) {
+    next(error);
+  }
+}

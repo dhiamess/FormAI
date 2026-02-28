@@ -24,9 +24,9 @@ export class SubmissionService {
     }
 
     // Valider les données contre le schéma du formulaire
-    this.validateSubmissionData(form.schema.fields, data.values);
+    this.validateSubmissionData(form.formSchema.fields, data.values);
 
-    const Model = getDynamicModel(formId, form.schema.fields);
+    const Model = getDynamicModel(formId, form.formSchema.fields);
 
     const submission = await Model.create({
       formId: form._id,
@@ -67,7 +67,7 @@ export class SubmissionService {
     const form = await Form.findById(formId);
     if (!form) throw new NotFoundError('Formulaire');
 
-    const Model = getDynamicModel(formId, form.schema.fields);
+    const Model = getDynamicModel(formId, form.formSchema.fields);
 
     const filter: Record<string, unknown> = { formId: form._id };
     if (status) filter.status = status;
@@ -91,7 +91,7 @@ export class SubmissionService {
     const form = await Form.findById(formId);
     if (!form) throw new NotFoundError('Formulaire');
 
-    const Model = getDynamicModel(formId, form.schema.fields);
+    const Model = getDynamicModel(formId, form.formSchema.fields);
     const submission = await Model.findById(submissionId);
 
     if (!submission) throw new NotFoundError('Soumission');
@@ -106,7 +106,7 @@ export class SubmissionService {
     const form = await Form.findById(formId);
     if (!form) throw new NotFoundError('Formulaire');
 
-    const Model = getDynamicModel(formId, form.schema.fields);
+    const Model = getDynamicModel(formId, form.formSchema.fields);
     const submission = await Model.findByIdAndUpdate(
       submissionId,
       { status },
@@ -125,7 +125,7 @@ export class SubmissionService {
     const form = await Form.findById(formId);
     if (!form) throw new NotFoundError('Formulaire');
 
-    const Model = getDynamicModel(formId, form.schema.fields);
+    const Model = getDynamicModel(formId, form.formSchema.fields);
     const result = await Model.findByIdAndDelete(submissionId);
 
     if (!result) throw new NotFoundError('Soumission');
@@ -141,14 +141,15 @@ export class SubmissionService {
     const form = await Form.findById(formId);
     if (!form) throw new NotFoundError('Formulaire');
 
-    const Model = getDynamicModel(formId, form.schema.fields);
+    const Model = getDynamicModel(formId, form.formSchema.fields);
     const submissions = await Model.find({
       formId: form._id,
       isTestSubmission: false,
     }).sort({ 'metadata.submittedAt': -1 });
 
     // Construire le CSV
-    const dataFields = form.schema.fields.filter(
+    const allFields = form.formSchema.fields as Array<{ type: string; label: string; name: string }>;
+    const dataFields = allFields.filter(
       (f) => !['section', 'heading', 'paragraph'].includes(f.type),
     );
 

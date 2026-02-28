@@ -11,11 +11,11 @@ export interface IFormDocument extends Document {
   version: number;
   versions: Array<{
     version: number;
-    schema: IFormSchema;
+    formSchema: IFormSchema;
     createdAt: Date;
     createdBy: mongoose.Types.ObjectId;
   }>;
-  schema: IFormSchema;
+  formSchema: IFormSchema;
   collectionName: string;
   accessControl: {
     viewGroups: mongoose.Types.ObjectId[];
@@ -102,7 +102,7 @@ const FormSchemaDefinition = new Schema(
   { _id: false },
 );
 
-const FormSchema = new Schema<IFormDocument>(
+const FormMongooseSchema = new Schema<IFormDocument>(
   {
     name: { type: String, required: true, trim: true },
     slug: { type: String, required: true, lowercase: true },
@@ -113,11 +113,11 @@ const FormSchema = new Schema<IFormDocument>(
     version: { type: Number, default: 1 },
     versions: [{
       version: Number,
-      schema: FormSchemaDefinition,
+      formSchema: FormSchemaDefinition,
       createdAt: { type: Date, default: Date.now },
       createdBy: { type: Schema.Types.ObjectId, ref: 'User' },
     }],
-    schema: FormSchemaDefinition,
+    formSchema: FormSchemaDefinition,
     collectionName: { type: String, required: true },
     accessControl: {
       viewGroups: [{ type: Schema.Types.ObjectId, ref: 'Group' }],
@@ -146,8 +146,8 @@ const FormSchema = new Schema<IFormDocument>(
   { timestamps: true },
 );
 
-FormSchema.index({ organization: 1, slug: 1 }, { unique: true });
-FormSchema.index({ status: 1 });
-FormSchema.index({ createdBy: 1 });
+FormMongooseSchema.index({ organization: 1, slug: 1 }, { unique: true });
+FormMongooseSchema.index({ status: 1 });
+FormMongooseSchema.index({ createdBy: 1 });
 
-export const Form = mongoose.model<IFormDocument>('Form', FormSchema);
+export const Form = mongoose.model<IFormDocument>('Form', FormMongooseSchema);

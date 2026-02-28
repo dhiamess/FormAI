@@ -12,7 +12,7 @@ export class FormService {
   async create(data: {
     name: string;
     description: string;
-    schema: Record<string, unknown>;
+    formSchema: Record<string, unknown>;
     organization: string;
     createdBy: string;
     isPublic?: boolean;
@@ -31,7 +31,7 @@ export class FormService {
       name: data.name,
       slug: `${slug}-${formId.toString().slice(-6)}`,
       description: data.description,
-      schema: data.schema,
+      formSchema: data.formSchema,
       organization: data.organization,
       createdBy: data.createdBy,
       collectionName,
@@ -39,7 +39,7 @@ export class FormService {
       version: 1,
       versions: [{
         version: 1,
-        schema: data.schema,
+        formSchema: data.formSchema,
         createdAt: new Date(),
         createdBy: data.createdBy,
       }],
@@ -52,7 +52,7 @@ export class FormService {
     });
 
     // Créer la collection dynamique
-    createDynamicModel(formId.toString(), (data.schema as { fields: [] }).fields || []);
+    createDynamicModel(formId.toString(), (data.formSchema as { fields: [] }).fields || []);
 
     logger.info('Form created', { formId: form._id, name: form.name });
 
@@ -126,7 +126,7 @@ export class FormService {
   async update(formId: string, data: {
     name?: string;
     description?: string;
-    schema?: Record<string, unknown>;
+    formSchema?: Record<string, unknown>;
     updatedBy: string;
   }): Promise<IFormDocument> {
     const form = await Form.findById(formId);
@@ -135,18 +135,18 @@ export class FormService {
     if (data.name) form.name = data.name;
     if (data.description) form.description = data.description;
 
-    if (data.schema) {
+    if (data.formSchema) {
       form.version += 1;
-      form.schema = data.schema as IFormDocument['schema'];
+      form.formSchema = data.formSchema as unknown as IFormDocument['formSchema'];
       form.versions.push({
         version: form.version,
-        schema: data.schema as IFormDocument['schema'],
+        formSchema: data.formSchema as unknown as IFormDocument['formSchema'],
         createdAt: new Date(),
         createdBy: new mongoose.Types.ObjectId(data.updatedBy),
       });
 
       // Recréer le modèle dynamique
-      createDynamicModel(formId, (data.schema as { fields: [] }).fields || []);
+      createDynamicModel(formId, (data.formSchema as { fields: [] }).fields || []);
     }
 
     await form.save();
@@ -202,7 +202,7 @@ export class FormService {
     return this.create({
       name: `${original.name} (copie)`,
       description: original.description,
-      schema: original.schema.toObject(),
+      formSchema: original.toObject().formSchema as unknown as Record<string, unknown>,
       organization: original.organization.toString(),
       createdBy: userId,
     });

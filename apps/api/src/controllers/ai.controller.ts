@@ -18,7 +18,7 @@ export async function generate(req: AuthRequest, res: Response, next: NextFuncti
     const form = await formService.create({
       name: aiResult.name,
       description: aiResult.description,
-      schema: {
+      formSchema: {
         fields: aiResult.fields,
         layout: aiResult.layout,
         settings: aiResult.settings,
@@ -57,13 +57,13 @@ export async function refine(req: AuthRequest, res: Response, next: NextFunction
     const form = await formService.getById(formId);
 
     // Raffiner via l'IA
-    const aiResult = await aiService.refineForm(form.schema.toObject(), instructions);
+    const aiResult = await aiService.refineForm(form.toObject().formSchema, instructions);
 
     // Mettre à jour le formulaire
     const updatedForm = await formService.update(formId, {
       name: aiResult.name,
       description: aiResult.description,
-      schema: {
+      formSchema: {
         fields: aiResult.fields,
         layout: aiResult.layout,
         settings: aiResult.settings,

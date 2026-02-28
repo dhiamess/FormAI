@@ -20,7 +20,8 @@ export function createDynamicModel(formId: string, fields: FormField[]) {
     delete mongoose.models[collectionName];
   }
 
-  const schemaDefinition: Record<string, unknown> = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const schemaDefinition: any = {
     formId: { type: mongoose.Schema.Types.ObjectId, required: true, index: true },
     formVersion: { type: Number, required: true },
     data: { type: mongoose.Schema.Types.Mixed, required: true },

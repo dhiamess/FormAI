@@ -23,7 +23,7 @@ export function errorHandler(err: Error, _req: Request, res: Response, _next: Ne
   }
 
   // Erreur Mongoose de duplication
-  if (err.name === 'MongoServerError' && (err as Record<string, unknown>).code === 11000) {
+  if (err.name === 'MongoServerError' && (err as unknown as Record<string, unknown>).code === 11000) {
     return res.status(409).json({
       success: false,
       error: 'Cette ressource existe déjà',

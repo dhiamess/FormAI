@@ -5,6 +5,7 @@ import { requirePermission } from '../middleware/permissions';
 
 const router = Router();
 
+router.get('/slug/:slug', formsController.getFormBySlug);
 router.get('/', authenticate, requirePermission('forms.read'), formsController.listForms);
 router.post('/', authenticate, requirePermission('forms.create'), formsController.createForm);
 router.get('/:id', authenticate, requirePermission('forms.read'), formsController.getForm);
